@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyManager - Python Version Manager</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-brand">
+      <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M24 4C13 4 14 9 14 9V15H25V17H10C10 17 4 16.3 4 27C4 37.7 9.3 38 9.3 38H13V31.5C13 31.5 12.7 26 18 26H29.5C29.5 26 34 26.3 34 21.5V10C34 10 35.1 4 24 4Z" fill="#3776AB"/>
+        <path d="M24 44C35 44 34 39 34 39V33H23V31H38C38 31 44 31.7 44 21C44 10.3 38.7 10 38.7 10H35V16.5C35 16.5 35.3 22 30 22H18.5C18.5 22 14 21.7 14 26.5V38C14 38 12.9 44 24 44Z" fill="#FFD343"/>
+        <circle cx="19" cy="11" r="2" fill="white"/>
+        <circle cx="29" cy="37" r="2" fill="white"/>
+      </svg>
+      <span class="logo-text">PyManager</span>
+    </div>
+
+    <label class="header-search" aria-label="Search Python installations">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search version, source, or path" autocomplete="off">
+    </label>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="scan-btn" title="Rescan installations">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M14 8A6 6 0 1 1 8 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 1L11 4L8 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Rescan
+      </button>
+      <button class="btn btn-primary" id="add-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        </svg>
+        Add Python
+      </button>
+    </div>
+  </header>
+
+  <section class="stats-bar" id="stats-bar" aria-label="Summary">
+    <div class="stat-item">
+      <span class="stat-num" id="stat-total">-</span>
+      <span class="stat-label">installations</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-sources">-</span>
+      <span class="stat-label">sources</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num" id="stat-latest">-</span>
+      <span class="stat-label">latest</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div id="filter-chips" class="filter-chips"></div>
+  </section>
+
+  <section class="setup-banner hidden" id="setup-banner" aria-live="polite">
+    <div class="setup-copy">
+      <strong id="setup-title">Tooling setup</strong>
+      <span id="setup-desc">Checking uv and the app virtual environment...</span>
+    </div>
+    <button class="btn btn-primary" id="install-uv-main">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 13.5H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      Install uv
+    </button>
+  </section>
+
+  <main class="main">
+    <div id="python-grid" class="python-grid">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Scanning Python installations...</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="overlay hidden" id="install-overlay">
+    <div class="modal modal-install" role="dialog" aria-modal="true" aria-labelledby="install-title">
+      <div class="modal-header">
+        <h2 id="install-title">Add Python</h2>
+        <button class="icon-btn" id="close-install" title="Close">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M4 4L14 14M14 4L4 14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <section class="modal-section setup-card" id="tooling-section">
+          <div class="section-title">Tooling setup</div>
+          <div id="tooling-status" class="tooling-status">
+            <div class="loading-methods">Checking uv and app venv...</div>
+          </div>
+          <button class="btn btn-ghost" id="install-uv-btn">Install uv and app venv</button>
+        </section>
+
+        <section class="modal-section">
+          <div class="section-title">Install new version</div>
+
+          <div class="install-options">
+            <div class="option-group">
+              <label class="option-label">Install method</label>
+              <div class="radio-group" id="install-method-list">
+                <div class="loading-methods">Detecting install tools...</div>
+              </div>
+            </div>
+
+            <div class="option-group" id="arch-group">
+              <label class="option-label">Architecture</label>
+              <div class="radio-group radio-group-small">
+                <label class="radio-item active">
+                  <input type="radio" name="arch" value="64" checked>
+                  <span class="radio-text"><strong>64-bit</strong></span>
+                </label>
+                <label class="radio-item">
+                  <input type="radio" name="arch" value="32">
+                  <span class="radio-text"><strong>32-bit</strong></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="version-section">
+            <div class="version-section-header">
+              <label class="option-label">Version</label>
+              <div class="version-filter-btns">
+                <button class="filter-btn active" data-eol="all">All</button>
+                <button class="filter-btn" data-eol="supported">Supported</button>
+              </div>
+            </div>
+            <div id="version-list" class="version-list">
+              <div class="loading-state small">
+                <div class="spinner"></div>
+                <p>Loading versions...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="modal-section">
+          <div class="section-title">Track existing install</div>
+          <div class="custom-path-row">
+            <input id="custom-path-input" class="text-input" type="text" placeholder="Folder or Python executable path">
+            <button class="btn btn-ghost" id="add-custom-path">Track</button>
+          </div>
+          <div id="custom-path-feedback" class="inline-feedback"></div>
+          <div id="custom-path-list" class="custom-path-list"></div>
+        </section>
+      </div>
+
+      <div class="modal-footer">
+        <div id="selected-version-display" class="selected-version">No version selected</div>
+        <div class="modal-footer-actions">
+          <button class="btn btn-ghost" id="cancel-install">Cancel</button>
+          <button class="btn btn-primary" id="confirm-install" disabled>Install</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="job-overlay">
+    <div class="modal modal-job" role="dialog" aria-modal="true" aria-labelledby="job-title">
+      <div class="modal-header">
+        <h2 id="job-title">Working...</h2>
+        <div id="job-status-icon" class="job-status-icon running">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="terminal" id="job-terminal"></div>
+      </div>
+      <div class="modal-footer align-end">
+        <button class="btn btn-primary" id="close-job" disabled>Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="confirm-overlay">
+    <div class="modal modal-confirm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="modal-header">
+        <h2 id="confirm-title">Remove Python</h2>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-mark">!</div>
+        <p>Remove <strong id="confirm-version"></strong>?</p>
+        <p class="text-muted">Mode: <span id="confirm-mode"></span></p>
+        <p class="path-preview" id="confirm-path"></p>
+      </div>
+      <div class="modal-footer align-end">
+        <button class="btn btn-ghost" id="cancel-uninstall">Cancel</button>
+        <button class="btn btn-danger" id="confirm-uninstall-btn">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
