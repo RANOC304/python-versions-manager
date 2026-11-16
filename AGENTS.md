@@ -7,7 +7,7 @@ Read and follow the shared instructions at /home/aubin/.codex/AGENTS.md. Apply g
 ## Assigned author
 
 - Account: personal
-- Author name: Aubin
+- Author name: RANOC304
 - Author email: aubinsprinter@gmail.com
 
 ## Repository description
