@@ -16,6 +16,12 @@ Read and follow the shared instructions at /home/aubin/.codex/AGENTS.md. Apply g
 
 - BrowserOS neo profile: Unassigned. Record the exact local profile name when assigned.
 
+### Assets
+
+- Assets path: None
+- Keep: False
+- Asset kinds: all
+
 ## Assigned skills
 
 Only shared skills from /home/aubin/.agents/skills may be assigned here. Read relevant assigned skills before use. Leave this list empty until skills are assigned.
